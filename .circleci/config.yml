@@ -1,8 +1,21 @@
 version: 2
-jobs: 
-  build:
+jobs:
+  one:
     docker:
       - image: circleci/node:10
     steps:
       - checkout
-      - run: badcommand
+      - run: echo: "Dave rules."
+  two:
+    docker:
+      - image: circleci/node:10
+     steps:
+      - checkout
+      - run: echo "Dave still rules"
+      - run: sleep 15
+workflows:
+  version: 2
+  one_and_two:
+    jobs:
+      - one
+      - two
