@@ -9,7 +9,7 @@ jobs:
   two:
     docker:
       - image: circleci/node:10
-     steps:
+    steps:
       - checkout
       - run: echo "Dave still rules"
       - run: sleep 15
