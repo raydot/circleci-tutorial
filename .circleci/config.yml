@@ -5,7 +5,7 @@ jobs:
       - image: circleci/node:10
     steps:
       - checkout
-      - run: echo: "Dave rules."
+      - run: echo "Dave rules."
   two:
     docker:
       - image: circleci/node:10
