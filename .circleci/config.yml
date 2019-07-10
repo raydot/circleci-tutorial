@@ -1,66 +1,40 @@
-{
-  "version": 2, 
-  "jobs": {
-    "two": {
-      "docker": [
-        {
-          "image": "circleci/node:10"
-        }
-      ], 
-      "steps": [
-        "checkout", 
-        {
-          "run": "echo \"Dave still rules\""
-        }, 
-        {
-          "attach_workspace": {
-            "at": "my_workspace"
-          }
-        }, 
-        {
-          "run": "if [[ $(cat my_workspace/echo-output) == \"Trying out workspaces\" ]]; then\n  echo \"It worked!\";\nelse\n  echo \"No no no!\"; exit 1\nfi\n"
-        }
-      ]
-    }, 
-    "one": {
-      "docker": [
-        {
-          "image": "circleci/node:10"
-        }
-      ], 
-      "steps": [
-        "checkout", 
-        {
-          "run": "echo \"Dave rules.\""
-        }, 
-        {
-          "run": "mkdir -p my_workspace"
-        }, 
-        {
-          "run": "echo \"Trying out workspaces\" > my_workspace/echo-output"
-        }, 
-        {
-          "paths": [
-            "echo-output"
-          ], 
-          "persist_to_workspace": null, 
-          "root": "my_workspace"
-        }
-      ]
-    }
-  }, 
-  "workflows": {
-    "version": 2, 
-    "one_and_two": {
-      "jobs": [
-        "one", 
-        {
-          "requires": [
-            "one"
-          ], 
-          "two": null
-        }
-      ]
-    }
-  }
-}
+version: 2
+jobs:
+  one:
+    docker:
+      - image: circleci/ruby:2.4.1
+    steps:
+      - checkout
+      - run: echo "Dave Rules"
+      - run: mkdir -p my_workspace
+      - run: echo "Trying out workspaces" > my_workspace/echo-output
+      - persist_to_workspace:
+          # Must be an absolute path, or relative path from working_directory
+          root: my_workspace
+          # Must be relative path from root
+          paths:
+            - echo-output      
+  two:
+    docker:
+      - image: circleci/ruby:2.4.1
+    steps:
+      - checkout
+      - run: echo "Dave Rules more"  
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: my_workspace
+
+      - run: |
+          if [[ $(cat my_workspace/echo-output) == "Trying out workspaces" ]]; then
+            echo "It worked!";
+          else
+            echo "Nope!"; exit 1
+          fi
+workflows:
+  version: 2
+  one_and_two:
+    jobs:
+      - one
+      - two:
+          requires:
+            - one
